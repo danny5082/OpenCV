@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34018.315
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCVApp20", "OpenCVApp20\OpenCVApp20.csproj", "{EF20B6FC-736C-428C-8E89-854AD87EDE6B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EF20B6FC-736C-428C-8E89-854AD87EDE6B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EF20B6FC-736C-428C-8E89-854AD87EDE6B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EF20B6FC-736C-428C-8E89-854AD87EDE6B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EF20B6FC-736C-428C-8E89-854AD87EDE6B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {31BD11B0-7A7C-4D75-93FB-333014509A51}
+	EndGlobalSection
+EndGlobal

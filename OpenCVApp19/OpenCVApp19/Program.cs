@@ -17,8 +17,8 @@ namespace OpenCVApp19
 
 			ImageEncodingParam[] prms = new ImageEncodingParam[]
 			{
-				new ImageEncodingParam(ImwriteFlags.JpegQuality,100),
-				new ImageEncodingParam(ImwriteFlags.JpegProgressive,1)
+				new ImageEncodingParam(ImwriteFlags.JpegQuality , 100),
+				new ImageEncodingParam(ImwriteFlags.JpegProgressive , 1)
 			};
 			save = Cv2.ImWrite("CV.jpeg", img, prms);
 			Console.WriteLine(save);

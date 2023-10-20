@@ -1,4 +1,4 @@
-﻿namespace OpevCVApp25
+﻿namespace OpenCVApp25
 {
 	partial class Form1
 	{
@@ -34,16 +34,15 @@
 			button4 = new Button();
 			button5 = new Button();
 			button6 = new Button();
-			button7 = new Button();
 			pictureBox1 = new PictureBox();
 			((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
 			SuspendLayout();
 			// 
 			// button1
 			// 
-			button1.Location = new Point(12, 12);
+			button1.Location = new Point(0, 0);
 			button1.Name = "button1";
-			button1.Size = new Size(153, 49);
+			button1.Size = new Size(153, 77);
 			button1.TabIndex = 0;
 			button1.Text = "button1";
 			button1.UseVisualStyleBackColor = true;
@@ -51,9 +50,9 @@
 			// 
 			// button2
 			// 
-			button2.Location = new Point(171, 12);
+			button2.Location = new Point(159, 0);
 			button2.Name = "button2";
-			button2.Size = new Size(153, 49);
+			button2.Size = new Size(153, 77);
 			button2.TabIndex = 1;
 			button2.Text = "button2";
 			button2.UseVisualStyleBackColor = true;
@@ -61,9 +60,9 @@
 			// 
 			// button3
 			// 
-			button3.Location = new Point(12, 67);
+			button3.Location = new Point(0, 123);
 			button3.Name = "button3";
-			button3.Size = new Size(153, 49);
+			button3.Size = new Size(153, 77);
 			button3.TabIndex = 2;
 			button3.Text = "button3";
 			button3.UseVisualStyleBackColor = true;
@@ -71,9 +70,9 @@
 			// 
 			// button4
 			// 
-			button4.Location = new Point(171, 67);
+			button4.Location = new Point(159, 123);
 			button4.Name = "button4";
-			button4.Size = new Size(153, 49);
+			button4.Size = new Size(153, 77);
 			button4.TabIndex = 3;
 			button4.Text = "button4";
 			button4.UseVisualStyleBackColor = true;
@@ -81,9 +80,9 @@
 			// 
 			// button5
 			// 
-			button5.Location = new Point(12, 122);
+			button5.Location = new Point(0, 269);
 			button5.Name = "button5";
-			button5.Size = new Size(153, 49);
+			button5.Size = new Size(153, 77);
 			button5.TabIndex = 4;
 			button5.Text = "button5";
 			button5.UseVisualStyleBackColor = true;
@@ -91,29 +90,20 @@
 			// 
 			// button6
 			// 
-			button6.Location = new Point(171, 122);
+			button6.Location = new Point(159, 269);
 			button6.Name = "button6";
-			button6.Size = new Size(153, 49);
+			button6.Size = new Size(153, 77);
 			button6.TabIndex = 5;
 			button6.Text = "button6";
 			button6.UseVisualStyleBackColor = true;
 			button6.Click += button6_Click;
 			// 
-			// button7
-			// 
-			button7.Location = new Point(113, 328);
-			button7.Name = "button7";
-			button7.Size = new Size(8, 11);
-			button7.TabIndex = 6;
-			button7.Text = "button7";
-			button7.UseVisualStyleBackColor = true;
-			// 
 			// pictureBox1
 			// 
-			pictureBox1.Location = new Point(330, 12);
+			pictureBox1.Location = new Point(318, 12);
 			pictureBox1.Name = "pictureBox1";
-			pictureBox1.Size = new Size(458, 426);
-			pictureBox1.TabIndex = 7;
+			pictureBox1.Size = new Size(470, 426);
+			pictureBox1.TabIndex = 6;
 			pictureBox1.TabStop = false;
 			// 
 			// Form1
@@ -122,7 +112,6 @@
 			AutoScaleMode = AutoScaleMode.Font;
 			ClientSize = new Size(800, 450);
 			Controls.Add(pictureBox1);
-			Controls.Add(button7);
 			Controls.Add(button6);
 			Controls.Add(button5);
 			Controls.Add(button4);
@@ -144,7 +133,6 @@
 		private Button button4;
 		private Button button5;
 		private Button button6;
-		private Button button7;
 		private PictureBox pictureBox1;
 	}
 }

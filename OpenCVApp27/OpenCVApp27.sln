@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34018.315
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCVApp27", "OpenCVApp27\OpenCVApp27.csproj", "{7891B943-31AA-4DE4-908B-6E03A4030909}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7891B943-31AA-4DE4-908B-6E03A4030909}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7891B943-31AA-4DE4-908B-6E03A4030909}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7891B943-31AA-4DE4-908B-6E03A4030909}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7891B943-31AA-4DE4-908B-6E03A4030909}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8531163C-9EE7-4AA7-873D-3E00797D5ECB}
+	EndGlobalSection
+EndGlobal

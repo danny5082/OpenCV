@@ -1,4 +1,4 @@
-namespace OpevCVApp25
+namespace OpenCVApp25
 {
 	internal static class Program
 	{

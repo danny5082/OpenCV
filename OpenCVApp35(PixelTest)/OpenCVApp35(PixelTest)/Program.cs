@@ -31,7 +31,7 @@ namespace OpenCVApp35_PixelTest_
 			}
 			image.Rectangle(roi, Scalar.White, 1);
 			Cv2.ImShow("image", image);
-			Cv2.ImShow("roiImage", roi_img);
+			Cv2.ImShow("roiImage", roi_img.Resize(new Size(200,100)));
 			Cv2.WaitKey(0);
 
 		}

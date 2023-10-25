@@ -1,272 +1,312 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenCvSharp;
-using OpenCvSharp.XFeatures2D;
 
 namespace OpenCVApp30_그림판_
 {
-    public static class IconFlags
-    {
-        public const int DRAW_RECTANGLE = 0;
-        public const int DRAW_CIRCLE = 1;
-        public const int DRAW_ELLIPSE = 2;
-        public const int DRAW_LINE = 3;
-        public const int DRAW_BRUSH = 4;
-        public const int ERASE = 5;
-        public const int OPEN = 6;
-        public const int SAVE = 7;
-        public const int PLUS = 8;
-        public const int MINUS = 9;
-        public const int CLEAR = 10;
-        public const int COLOR = 11;
-        public const int PALETTE = 12;
-        public const int HUE_IDX = 13;
-    }
+	public static class IconFlags
+	{
+		public const int DRAW_RECTANGLE = 0;
+		public const int DRAW_CIRCLE = 1;
+		public const int DRAW_ELLIPSE = 2;
+		public const int DRAW_LINE = 3;
+		public const int DRAW_BRUSH = 4;
+		public const int ERASE = 5;
+		public const int OPEN = 6;
+		public const int SAVE = 7;
+		public const int PLUS = 8;
+		public const int MINUS = 9;
+		public const int CLEAR = 10;
+		public const int COLOR = 11;
+		public const int PALETTE = 12;
+		public const int HUE_IDX = 13;
+	}
 
-    public class Menu
-    {
-        private int hue;
-        private List<Rect> icons = new List<Rect>();
-        private Mat image;
+	public class Menu
+	{
+		private int hue;
+		private List<Rect> icons = new List<Rect>();
+		private Mat image;
+		public int thickness = 3; // 굵기 설정
 
-        public List<Rect> Icons => icons;
-        public Mat Image => image;
-        public int MouseMode { get; private set; } = 0; // 수정: MouseMode를 public으로 변경
-        public int CommandMode { get; private set; } = 0; // 수정: CommandMode를 public으로 변경
-        int drawMode = 0;
-        Point pt1, pt2;
+		public List<Rect> Icons => icons;
+		public Mat Image => image;
+		public int MouseMode { get; private set; } = 0;
+		public int CommandMode { get; private set; } = 0;
+		int drawMode = 0;
+		Point pt1, pt2;
+		Scalar Color = new Scalar(0, 0, 0);
 
-        public Menu()
-        {
-            image = new Mat(500, 800, MatType.CV_8UC3, Scalar.All(255));
-        }
 
-        public void PlaceIcons(Size size)
-        {
-            List<string> iconNames = new List<string>
-            {
-                "rect", "circle", "ellipse", "line", "brush", "eraser",
-                "open", "save", "plus", "minus", "clear", "color"
-            };
+		public Menu()
+		{
+			image = new Mat(500, 800, MatType.CV_8UC3, Scalar.All(255));
+		}
 
-            int btnRows = (int)Math.Ceiling(iconNames.Count / 2.0);
+		public void PlaceIcons(Size size)
+		{
+			List<string> iconNames = new List<string>
+			{
+				"rect", "circle", "ellipse", "line", "brush", "eraser",
+				"open", "save", "plus", "minus", "clear", "color"
+			};
 
-            for (int i = 0, k = 0; i < btnRows; i++)
-            {
-                for (int j = 0; j < 2; j++, k++)
-                {
-                    Point pt = new Point(j * size.Width, i * size.Height);
-                    icons.Add(new Rect(pt, size));
+			int btnRows = (int)Math.Ceiling(iconNames.Count / 2.0);
 
-                    Mat icon = Cv2.ImRead(iconNames[k] + ".jpg", ImreadModes.Color);
-                    if (icon.Empty()) continue;
+			for (int i = 0, k = 0; i < btnRows; i++)
+			{
+				for (int j = 0; j < 2; j++, k++)
+				{
+					Point pt = new Point(j * size.Width, i * size.Height);
+					icons.Add(new Rect(pt, size));
 
-                    Cv2.Resize(icon, icon, size);
-                    icon.CopyTo(image.SubMat(icons[k]));
-                }
-            }
-        }
+					Mat icon = Cv2.ImRead(iconNames[k] + ".jpg", ImreadModes.Color);
+					if (icon.Empty()) continue;
 
-        public void CreateHueIndex(Rect rect)
-        {
-            Mat hueIndex = image.SubMat(rect);
-            float ratio = 180.0f / rect.Height;
+					Cv2.Resize(icon, icon, size);
+					icon.CopyTo(image.SubMat(icons[k]));
+				}
+			}
+		}
 
-            for (int i = 0; i < rect.Height; i++)
-            {
-                Scalar hueColor = new Scalar(i * ratio, 255, 255);
-                hueIndex.Row(i).SetTo(hueColor);
-            }
-            Cv2.CvtColor(hueIndex, hueIndex, ColorConversionCodes.HSV2BGR);
-        }
+		public void CreateHueIndex(Rect rect)
+		{
+			Mat hueIndex = image.SubMat(rect);
+			float ratio = 180.0f / rect.Height;
 
-        public void CreatePalette(int posY, Rect paletteRect)
-        {
-            Mat palette = image.SubMat(paletteRect);
-            float ratio1 = 180.0f / paletteRect.Height;
-            float ratio2 = 256.0f / paletteRect.Width;
-            float ratio3 = 256.0f / paletteRect.Height;
+			for (int i = 0; i < rect.Height; i++)
+			{
+				Scalar hueColor = new Scalar(i * ratio, 255, 255);
+				hueIndex.Row(i).SetTo(hueColor);
+			}
+			Cv2.CvtColor(hueIndex, hueIndex, ColorConversionCodes.HSV2BGR);
+		}
 
-            hue = (int)Math.Round((posY - paletteRect.Top) * ratio1);
+		public void CreatePalette(int posY, Rect paletteRect)
+		{
+			Mat palette = image.SubMat(paletteRect);
+			float ratio1 = 180.0f / paletteRect.Height;
+			float ratio2 = 256.0f / paletteRect.Width;
+			float ratio3 = 256.0f / paletteRect.Height;
 
-            for (int i = 0; i < palette.Rows; i++)
-            {
-                for (int j = 0; j < palette.Cols; j++)
-                {
-                    int saturation = (int)Math.Round(j * ratio2);
-                    int intensity = (int)Math.Round((palette.Rows - i - 1) * ratio3);
-                    palette.At<Vec3b>(i, j) = new Vec3b((byte)hue, (byte)saturation, (byte)intensity);
-                }
-            }
-            Cv2.CvtColor(palette, palette, ColorConversionCodes.HSV2BGR);
-        }
+			hue = (int)Math.Round((posY - paletteRect.Top) * ratio1);
 
-        public void OnMouse(MouseEventTypes @event, int x, int y, MouseEventFlags flags, IntPtr userdata)
-        {
-            Point pt = new Point(x, y);
-            if (@event == MouseEventTypes.LButtonUp)
-            {
-                Console.WriteLine("마우스 왼쪽 버튼 떼기");
-                for (int i = 0; i < icons.Count; i++)
-                {
-                    if (icons[i].Contains(pt))
-                    {
-                        if (i < 6)
-                        {
-                            MouseMode = 0; // 수정: MouseMode를 변경
-                            drawMode = i;
-                        }
-                        else
-                            CommandMode = i; // 수정: CommandMode를 변경
-                        return;
-                    }
-                }
-                pt2 = pt;
-                MouseMode = 1; // 수정: MouseMode를 변경
-            }
-            else if (@event == MouseEventTypes.LButtonDown)
-            {
-                pt1 = pt;
-                MouseMode = 2; // 수정: MouseMode를 변경
-                Console.WriteLine("마우스 왼쪽 버튼 누르기");
-            }
-            if (MouseMode >= 2) // 수정: MouseMode를 변경
-            {
-                Rect rect = new Rect(0, 0, 125, image.Rows);
-                MouseMode = (rect.Contains(pt)) ? 0 : 3; // 수정: MouseMode를 변경
-                pt2 = pt;
-            }
-        }
+			for (int i = 0; i < palette.Rows; i++)
+			{
+				for (int j = 0; j < palette.Cols; j++)
+				{
+					int saturation = (int)Math.Round(j * ratio2);
+					int intensity = (int)Math.Round((palette.Rows - i - 1) * ratio3);
+					palette.At<Vec3b>(i, j) = new Vec3b((byte)hue, (byte)saturation, (byte)intensity);
+				}
+			}
+			Cv2.CvtColor(palette, palette, ColorConversionCodes.HSV2BGR);
+		}
 
-        public void Draw(Mat image, Scalar color = default)
-        {
-            if (color == default)
-            {
-                color = new Scalar(0, 0, 0);
-            }
+		public void OnMouse(MouseEventTypes eventTypes, int x, int y, MouseEventFlags flags, IntPtr userdata)
+		{
+			Point pt = new Point(x, y);
+			if (eventTypes == MouseEventTypes.LButtonUp)
+			{
+				for (int i = 0; i < icons.Count; i++)
+				{
+					if (icons[i].Contains(pt))
+					{
+						if (i < 6)
+						{
+							//pt2 = pt;
+							MouseMode = 0; //마우스 모드
+							drawMode = i;  // 그리기 모드
+							Command(i);
+							Console.WriteLine($"draw_mode : {drawMode}, mouse_mode : {MouseMode}  pt2:{pt2.Y}");
+						}
+						else
+						{
+							Command(i);
+							Console.WriteLine($"draw_mode : {drawMode}, mouse_mode : {MouseMode} pt2:{pt2.Y}");
+						}
+						return;
+					}
+				}
+				pt2 = pt;
+				MouseMode = 1;
+			}
+			else if (eventTypes == MouseEventTypes.LButtonDown)
+			{
+				pt1 = pt;
+				MouseMode = 2;
 
-            if (drawMode == IconFlags.DRAW_RECTANGLE)
-            {
-                Cv2.Rectangle(image, pt1, pt2, color, -1, LineTypes.Link8);
-            }
-            else if (drawMode == IconFlags.DRAW_LINE)
-            {
-                Cv2.Line(image, pt1, pt2, color, 1, LineTypes.AntiAlias);
-            }
-            else if (drawMode == IconFlags.DRAW_BRUSH)
-            {
-                Cv2.Line(image, pt1, pt2, color, (1 * 3), LineTypes.Link8);
-                pt1 = pt2;
-            }
-            else if (drawMode == IconFlags.ERASE)
-            {
-                Cv2.Line(image, pt1, pt2, new Scalar(255, 255, 255), (1 * 5), LineTypes.Link8);
-                pt1 = pt2;
-            }
-            else if (drawMode == IconFlags.DRAW_CIRCLE)
-            {
-                Point2d pt3 = pt1 - pt2;
-                int radius = (int)Math.Sqrt(pt3.X * pt3.X + pt3.Y * pt3.Y);
-                Cv2.Circle(image, pt1, radius, color, -1, LineTypes.Link8);
-            }
-            else if (drawMode == IconFlags.DRAW_ELLIPSE)
-            {
-                Point center = new Point((int)((pt1.X + pt2.X) / 2.0), (int)((pt1.Y + pt2.Y) / 2.0));
-                Size size = new Size(Math.Abs(pt1.X - pt2.X) / 2.0, Math.Abs(pt1.Y - pt2.Y) / 2.0);
-                Cv2.Ellipse(image, center, size, 0, 0, 360, color, -1, LineTypes.AntiAlias);
-            }
+				Console.WriteLine($"왼쪽 마우스가 클릭되었습니다.\n " +
+					$"draw_mode : {drawMode}, mouse_mode : {MouseMode} pt2:{pt2.Y}");
+			}
 
-            Cv2.ImShow("그림판", image);
-        }
+			if (MouseMode >= 2)
+			{
+				Rect rect = new Rect(0, 0, 125, image.Rows);
+				MouseMode = rect.Contains(pt) ? 0 : 3;
+				pt2 = pt;
+			}
+		}
 
-        public void Command(int commandMode)
-        {
-            if (commandMode == IconFlags.PALETTE)
-            {
-                float ratio1 = 256.0f / icons[IconFlags.PALETTE].Height;
-                float ratio2 = 256.0f / icons[IconFlags.PALETTE].Width;
+		public void Draw(Mat image, Scalar color)
+		{
+			if (color == null)
+			{
+				color = new Scalar(200, 200, 200);
+			}
 
-                Point pt = pt2 - icons[IconFlags.PALETTE].TopLeft;
-                int saturation = (int)Math.Round(pt.X * ratio2);
-                int intensity = (int)Math.Round((icons[IconFlags.PALETTE].Height - pt.Y - 1) * ratio1);
-                Scalar hsi = new Scalar(hue, saturation, intensity);
+			switch (drawMode)
+			{
+				case IconFlags.DRAW_RECTANGLE:
+					Cv2.Rectangle(image, pt1, pt2, color, thickness);
+					break;
 
-                Mat mColor = image.SubMat(icons[IconFlags.COLOR]);
-                mColor.SetTo(hsi);
-                Cv2.CvtColor(mColor, mColor, ColorConversionCodes.HSV2BGR);
-                Cv2.Rectangle(image, icons[IconFlags.COLOR], new Scalar(0, 0, 0), 1);
-            }
-            else if (commandMode == IconFlags.PALETTE)
-            {
-                // MakePalette 메서드의 구현을 추가해야 합니다.
-            }
-            else if (commandMode == IconFlags.CLEAR)
-            {
-                image.SetTo(Scalar.All(255));
-                MouseMode = 0; // 수정: MouseMode를 변경
-            }
-            else if (commandMode == IconFlags.OPEN)
-            {
-                Mat tmp = Cv2.ImRead("my_save.jpg", ImreadModes.Color);
-                if (!tmp.Empty())
-                {
-                    Cv2.Resize(tmp, tmp, image.Size());
-                    tmp.CopyTo(image);
-                }
-            }
-            else if (commandMode == IconFlags.SAVE)
-            {
-                Cv2.ImWrite("my_save.jpg", image);
-            }
-            else if (commandMode == IconFlags.PLUS)
-            {
-                image += new Scalar(10, 10, 10);
-            }
-            else if (commandMode == IconFlags.MINUS)
-            {
-                image -= new Scalar(10, 10, 10);
-            }
+				case IconFlags.DRAW_LINE:
+					Cv2.Line(image, pt1, pt2, color, thickness);
+					break;
 
-            Cv2.ImShow("그림판", image);
-        }
-    }
+				case IconFlags.DRAW_BRUSH:
+					Cv2.Line(image, pt1, pt2, color, thickness * 3);
+					pt1 = pt2;
+					break;
 
-    internal class Program
-    {
-        static void Main(string[] args)
-        {
-            Menu menu = new Menu();
+				case IconFlags.ERASE:
+					Cv2.Line(image, pt1, pt2, new Scalar(255, 255, 255), thickness * 5);
+					pt1 = pt2;
+					break;
 
-            menu.PlaceIcons(new Size(60, 60));
+				case IconFlags.DRAW_CIRCLE:
+					Point pt3 = new Point(pt1.X - pt2.X, pt1.Y - pt2.Y);
+					int radius = (int)Math.Sqrt(pt3.X * pt3.X + pt3.Y * pt3.Y);
+					Cv2.Circle(image, pt1, radius, color, thickness);
+					break;
 
-            Rect lastIcon = menu.Icons[menu.Icons.Count - 1];
-            Point startPale = lastIcon.BottomRight + new Point(-120, 5);
+				case IconFlags.DRAW_ELLIPSE:
+					Point center = new Point((pt1.X + pt2.X) / 2, (pt1.Y + pt2.Y) / 2);
+					Size size = new Size(Math.Abs(pt1.X - pt2.X) / 2, Math.Abs(pt1.Y - pt2.Y) / 2);
+					Cv2.Ellipse(image, center, size, 0, 0, 360, color, thickness);
+					break;
+			}
 
-            menu.Icons.Add(new Rect(startPale, new Size(100, 100)));
-            menu.Icons.Add(new Rect(startPale + new Point(105, 0), new Size(15, 100))); // 수정: 괄호를 닫지 않음
+			Cv2.ImShow("그림판", image);
+		}
 
-            menu.CreateHueIndex(menu.Icons[IconFlags.HUE_IDX]);
-            menu.CreatePalette(startPale.Y, menu.Icons[IconFlags.PALETTE]);
 
-            Cv2.ImShow("그림판", menu.Image);
 
-            Cv2.SetMouseCallback("그림판", (MouseEventTypes @event, int x, int y, MouseEventFlags flags, IntPtr userdata) =>
-            {
-                menu.OnMouse(@event, x, y, flags, userdata);
+		public void Command(int commandMode)
+		{
+			if (commandMode == IconFlags.PALETTE)
+			{
+				float ratio1 = 180.0f / icons[IconFlags.PALETTE].Height;
+				float ratio2 = 256.0f / icons[IconFlags.PALETTE].Width;
 
-                if (menu.MouseMode == 0)
-                {
-                    menu.Command(menu.CommandMode);
-                }
-                else
-                {
-                    menu.Draw(menu.Image);
-                }
+				Point pt = pt2 - icons[IconFlags.PALETTE].TopLeft;
+				int saturation = (int)Math.Round(pt.X * ratio2);
+				int intensity = (int)Math.Round((icons[IconFlags.PALETTE].Height - pt.Y - 1) * ratio1);
+				Scalar hsi = new Scalar(hue, saturation, intensity);
 
-                Cv2.ImShow("그림판", menu.Image);
-            });
+				Mat mColor = image.SubMat(icons[IconFlags.COLOR]);
+				mColor.SetTo(hsi);
+				Cv2.CvtColor(mColor, mColor, ColorConversionCodes.HSV2BGR);
+				Cv2.Rectangle(image, icons[IconFlags.COLOR], new Scalar(0, 0, 0), 1);
 
-            Cv2.WaitKey();
-        }
-    }
+				Color = hsi;
+			}
+			else if (commandMode == IconFlags.COLOR)
+			{
+
+			}
+			else if (commandMode == IconFlags.HUE_IDX)
+			{
+				CreatePalette(pt2.Y, icons[IconFlags.PALETTE]);
+			}
+
+			else if (commandMode == IconFlags.CLEAR)
+			{
+				image.SetTo(Scalar.White);
+				MouseMode = 0;
+			}
+			else if (commandMode == IconFlags.OPEN)
+			{
+				Mat tmp = Cv2.ImRead("my_save.jpg", ImreadModes.Color);
+				if (!tmp.Empty())
+				{
+					Cv2.Resize(tmp, tmp, image.Size());
+					tmp.CopyTo(image);
+					Console.WriteLine("\"OpenCVApp30(그림판)\\bin\\Debug\\my_save.jpg 를 불러왔습니다. \" ");
+				}
+			}
+			else if (commandMode == IconFlags.SAVE)
+			{
+				Cv2.ImWrite("my_save.jpg", image);
+				Console.WriteLine("저장완료 :\"OpenCVApp30(그림판)\\bin\\Debug \" ");
+			}
+			else if (commandMode == IconFlags.PLUS)
+			{
+				// 밝기 조절은 그림 그리는 영역에만 적용
+				Mat drawArea = image.SubMat(Icons[IconFlags.DRAW_RECTANGLE]);
+
+				// 밝기 조절
+				drawArea += new Scalar(10, 10, 10);
+				Cv2.ImShow("그림판", image);
+			}
+			else if (commandMode == IconFlags.MINUS)
+			{
+				// 밝기 조절은 그림 그리는 영역에만 적용
+				Mat drawArea = image.SubMat(Icons[IconFlags.DRAW_RECTANGLE]);
+
+				// 밝기 조절
+				drawArea -= new Scalar(10, 10, 10);
+				Cv2.ImShow("그림판", image);
+			}
+			Cv2.ImShow("그림판", image);
+		}
+		public  void OnThickbar(int value, IntPtr thickness)
+		{
+			int add_value = value + 1;
+			Console.WriteLine($"추가 굵기 {add_value}");
+
+			thickness = thickness + add_value;
+		}
+	}
+
+	internal class Program
+	{
+
+		static void Main(string[] args)
+		{
+			Menu menu = new Menu();
+
+			menu.PlaceIcons(new Size(60, 60));
+
+			Rect lastIcon = menu.Icons[menu.Icons.Count - 1];
+			Point startPale = lastIcon.BottomRight + new Point(-120, 5);
+
+			menu.Icons.Add(new Rect(startPale, new Size(100, 100)));
+			menu.Icons.Add(new Rect(startPale + new Point(105, 0), new Size(15, 100)));
+
+			menu.CreateHueIndex(menu.Icons[IconFlags.HUE_IDX]);
+			menu.CreatePalette(startPale.Y, menu.Icons[IconFlags.PALETTE]);
+
+			Cv2.ImShow("그림판", menu.Image);
+			Cv2.CreateTrackbar("선굵기", "그림판", ref menu.thickness, 15, menu.OnThickbar);
+			Cv2.SetMouseCallback("그림판", (MouseEventTypes @event, int x, int y, MouseEventFlags flags, IntPtr userdata) =>
+			{
+				menu.OnMouse(@event, x, y, flags, userdata);
+
+				if (menu.MouseMode == 0)
+				{
+					menu.Command(menu.CommandMode);
+				}
+				else
+				{
+					menu.Draw(menu.Image ,Scalar.Black);
+				}
+
+				Cv2.ImShow("그림판", menu.Image);
+			});
+
+			Cv2.WaitKey();
+		}
+	}
 }

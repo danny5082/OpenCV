@@ -43,7 +43,7 @@ namespace OpenCVApp43_Histogram_Equalize
 			Mat image = Cv2.ImRead("C:\\Temp\\img\\equalize_test.jpg", ImreadModes.Grayscale);
 			if (image.Empty())
 			{
-				Console.WriteLine("이미지가 없습니다.");
+				Console.WriteLine("이미지 오류.");
 				Environment.Exit(0);
 			}
 

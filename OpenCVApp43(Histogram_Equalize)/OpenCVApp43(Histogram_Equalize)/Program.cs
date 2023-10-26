@@ -54,7 +54,7 @@ namespace OpenCVApp43_Histogram_Equalize
 			Mat hist_img1 = new Mat();
 			Mat hist_img2 = new Mat();
 
-			//////////////////////////내가 하는 히스토그램 평활화///////////
+			// 히스토그램 평활화 직접하기
 			create_hist(image, ref hist, ref hist_img);
 
 			Mat accum_hist = new Mat(hist.Size(), hist.Type(), new Scalar(0));
